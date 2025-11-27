@@ -3,60 +3,128 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Ukulele Chord Flashcards</title>
+<title>gcea</title>
 <style>
-  body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial; margin: 0; background:#f8f8f8; color:#2d5016; display:flex; justify-content:center; align-items:center; min-height:100vh; padding:20px; }
-  @media (prefers-color-scheme: dark) {
-    body { background:#1a2d10; color:#f8f8f8; }
+  :root {
+    /* Light mode palette */
+    --color-bg: #f8f8f8;
+    --color-text: #2d5016;
+    --color-primary: #2d5016;
+    --color-primary-text: #ffffff;
+    --color-secondary-bg: #d0d0d0;
+    --color-secondary-text: #2d5016;
+    --color-border: #b0b0b0;
+    --color-card-bg: #f5f5f5;
+    --color-shadow: rgba(0,0,0,0.1);
+
+    /* Control surfaces */
+    --color-input-bg: var(--color-card-bg);
+
+    /* Diagram colors */
+    --color-canvas-bg: #ffffff;
+    --color-canvas-bg-dark: #1a2d10;
+    --color-string: #9fc7df;
+    --color-fret: #cfeaf9;
+    --color-label: #0c4666;
+    --color-dot: #0b6fb2;
+    --color-muted: #c63a2b;
+    --color-dot-text: #ffffff;
   }
-  header { display:flex; align-items:center; gap:16px; margin-bottom:14px; }
-  h1 { font-size:28px; margin:0; color:#2d5016; }
+
   @media (prefers-color-scheme: dark) {
-    h1 { color:#f8f8f8; }
+    :root {
+      --color-bg: #1a2d10;
+      --color-text: #f8f8f8;
+      --color-primary: #f8f8f8;
+      --color-primary-text: #2d5016;
+      --color-secondary-bg: #3a6b1f;
+      --color-secondary-text: #f8f8f8;
+      --color-border: #5a8b3f;
+      --color-card-bg: #1a2d10;
+      --color-shadow: rgba(0,0,0,0.5);
+
+      --color-input-bg: var(--color-card-bg);
+    }
   }
+
+  body {
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial;
+    margin: 0;
+    background: var(--color-bg);
+    color: var(--color-text);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 20px;
+  }
+
+  h1 { font-size:28px; margin:0; color: var(--color-text); }
   .controls { display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
-  button, label { background:#2d5016; color:white; border:none; padding:8px 12px; border-radius:6px; cursor:pointer; }
-  @media (prefers-color-scheme: dark) {
-    button, label { background:#f8f8f8; color:#2d5016; }
+  button, label {
+    background: var(--color-primary);
+    color: var(--color-primary-text);
+    border: none;
+    padding: 8px 12px;
+    border-radius: 6px;
+    cursor: pointer;
   }
-  button.secondary { background:#d0d0d0; color:#2d5016; border:1px solid #b0b0b0; }
-  @media (prefers-color-scheme: dark) {
-    button.secondary { background:#3a6b1f; color:#f8f8f8; border:1px solid #5a8b3f; }
+  button.secondary, label.secondary {
+    background: var(--color-secondary-bg);
+    color: var(--color-secondary-text);
+    border: 1px solid var(--color-border);
   }
-  label.small { background:none; color:#2d5016; padding:0; }
-  @media (prefers-color-scheme: dark) {
-    label.small { color:#f8f8f8; }
+  label.small {
+    background: none;
+    color: var(--color-text);
+    padding: 0;
   }
-  .card { background:#f5f5f5; border-radius:12px; box-shadow:0 4px 10px rgba(0,0,0,0.1); padding:90px 32px; width:100%; max-width:560px; margin:0 auto; }
-  @media (prefers-color-scheme: dark) {
-    .card { background:#1a2d10; box-shadow:0 4px 10px rgba(0,0,0,0.5); }
+
+  .card {
+    background: var(--color-card-bg);
+    border-radius: 12px;
+    box-shadow: 0 4px 10px var(--color-shadow);
+    padding: 90px 32px;
+    width: 100%;
+    max-width: 560px;
+    margin: 0 auto;
   }
-  .chord-title { font-size:80px; font-weight:900; margin:8px 0; color:#2d5016; display:flex; align-items:center; gap:12px; }
-  @media (prefers-color-scheme: dark) {
-    .chord-title { color:#f8f8f8; }
+
+  .chord-title {
+    font-size: 80px;
+    font-weight: 900;
+    margin: 8px 0;
+    color: var(--color-text);
+    display: flex;
+    align-items: center;
+    gap: 12px;
   }
-  .small { font-size:13px; color:#2d5016; }
-  @media (prefers-color-scheme: dark) {
-    .small { color:#f8f8f8; }
+
+  .small { font-size: 13px; color: var(--color-text); }
+  .row { display: flex; gap: 12px; align-items: center; margin-top: 12px; flex-wrap: wrap; }
+
+  canvas {
+    background: var(--color-canvas-bg);
+    border-radius: 8px;
   }
-  .row { display:flex; gap:12px; align-items:center; margin-top:12px; flex-wrap:wrap; }
-  canvas { background:#ffffff; border-radius:8px; }
   @media (prefers-color-scheme: dark) {
-    canvas { background:#333333; }
+    canvas { background: var(--color-canvas-bg-dark); }
   }
-  .options { display:flex; gap:8px; align-items:center; margin-left:auto; }
-  input[type="checkbox"] { width:18px; height:18px; }
-  select { padding:8px; border-radius:6px; border:1px solid #b0b0b0; background:#f5f5f5; color:#2d5016; }
-  @media (prefers-color-scheme: dark) {
-    select { border:1px solid #5a8b3f; background:#1a2d10; color:#f8f8f8; }
+
+  select {
+    padding: 8px;
+    border-radius: 6px;
+    border: 1px solid var(--color-border);
+    background: var(--color-input-bg);
+    color: var(--color-text);
   }
+
+  input[type="checkbox"] { width: 18px; height: 18px; }
+
   #tipRow { transition: opacity 0.5s ease-out; }
   #tipRow.fade-out { opacity: 0; }
-  main { display:flex; justify-content:center; width:100%; }
-  footer { margin-top:14px; font-size:12px; color:#2d5016; }
-  @media (prefers-color-scheme: dark) {
-    footer { color:#f8f8f8; }
-  }
+  main { display: flex; justify-content: center; width: 100%; }
+  footer { margin-top: 14px; font-size: 12px; color: var(--color-text); }
 </style>
 </head>
 <body>
@@ -69,10 +137,12 @@
       </div>
       <div style="display:flex;flex-direction:column;gap:12px;min-width:200px;text-align:right;">
         <div style="display:flex;gap:8px;align-items:center;justify-content:flex-end;">
-          <label class="small" style="display:flex;gap:8px;align-items:center;color:#2d5016"><input id="showFingering" type="checkbox">Show fingering</label>
+          <label class="small" style="display:flex;gap:8px;align-items:center;">
+            <input id="showFingering" type="checkbox">Show fingering
+          </label>
         </div>
         <div style="display:flex;gap:8px;align-items:center;justify-content:flex-end;">
-          <select id="scale" title="Pick chord set" style="color:#2d5016">
+          <select id="scale" title="Pick chord set">
             <option value="all">All common chords</option>
             <option value="maj">Major only</option>
             <option value="min">Minor only</option>
@@ -80,8 +150,8 @@
           </select>
         </div>
         <div style="display:flex;gap:8px;align-items:center;justify-content:flex-end;">
-          <label class="small" style="color:#2d5016">Strum style:</label>
-          <select id="strumStyle" class="secondary" style="background:white;color:#2d5016;border:1px solid #b0b0b0;">
+          <label class="small">Strum style:</label>
+          <select id="strumStyle" class="secondary">
             <option value="down">Down strum</option>
             <option value="arpeggio">Arpeggio</option>
           </select>
@@ -94,8 +164,10 @@
     </div>
 
     <div style="display:flex;align-items:center;gap:12px;margin-top:16px;">
-      <div class="controls" style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
-        <label class="secondary" title="Auto advance every 5s"><input id="autoAdvance" type="checkbox" style="margin-right:8px">Auto</label>
+      <div class="controls">
+        <label class="secondary" title="Auto advance every 5s">
+          <input id="autoAdvance" type="checkbox" style="margin-right:8px">Auto
+        </label>
         <button id="prev" class="secondary">Previous</button>
         <button id="next">Next</button>
         <button id="play" class="secondary">Replay</button>
@@ -106,14 +178,11 @@
       <div class="small">Tip: Click Next or press space to get a new chord.</div>
     </div>
   </section>
-  <footer>
-  </footer>
+  <footer></footer>
 </main>
 
 <script>
-/* --- Data: chords in standard ukulele tuning G4 C4 E4 A4 (strings 4 ->1). 
-   Fingering: array of fret numbers or 'x' for muted/open '0' open. Format [G,C,E,A].
-   chordName, type, fingering, optional alias notes (frequencies will be computed). */
+/* --- Data: chords in standard ukulele tuning G4 C4 E4 A4 (strings 4 -> 1). */
 const CHORDS = [
   { name:"C", type:"Major", fingering:[0,0,0,3] },
   { name:"G", type:"Major", fingering:[0,2,3,2] },
@@ -132,10 +201,9 @@ const CHORDS = [
   { name:"F#m", type:"Minor", fingering:[4,4,3,2] }
 ];
 
-/* --- Tuning base notes (MIDI numbers): G4 C4 E4 A4
-   We'll compute frequencies from MIDI numbers. Standard A4=440Hz. */
+/* --- Tuning base notes (MIDI numbers): G4 C4 E4 A4; A4 = 440Hz. */
 const MIDI = { "G4":67, "C4":60, "E4":64, "A4":69 };
-const STRINGS = [MIDI.G4, MIDI.C4, MIDI.E4, MIDI.A4]; // string order high->low in data
+const STRINGS = [MIDI.G4, MIDI.C4, MIDI.E4, MIDI.A4];
 function midiToFreq(m) { return 440 * Math.pow(2,(m-69)/12); }
 
 /* --- UI refs */
@@ -159,10 +227,8 @@ const tipRow = document.getElementById('tipRow');
 /* --- Audio setup */
 const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 function playChord(frequencies, style='down') {
-  // Simple plucked/strummed synth: short attack, pluck-like envelope
   const now = audioCtx.currentTime;
   if (style === 'down') {
-    // all notes slightly staggered for strum feel
     frequencies.forEach((f,i) => {
       if (!f) return;
       const t = now + i*0.03;
@@ -178,7 +244,6 @@ function playChord(frequencies, style='down') {
       o.start(t); o.stop(t+2.5);
     });
   } else {
-    // arpeggio: play one-by-one with longer decay
     frequencies.forEach((f,i) => {
       if (!f) return;
       const t = now + i*0.2;
@@ -198,7 +263,6 @@ function playChord(frequencies, style='down') {
 
 /* --- Utility: compute played frequencies from fingering */
 function chordToFrequencies(fingering) {
-  // fingering order [G,C,E,A]; 0 => open, x => muted
   return fingering.map((fret,i) => {
     if (fret === 'x' || fret === 'X') return null;
     const baseMidi = STRINGS[i];
@@ -219,72 +283,77 @@ function renderChord(ci) {
   if (showFingering.checked) {
     diagram.style.display = 'block';
     drawDiagram(chord.fingering);
-  } else diagram.style.display = 'none';
-  // play automatically on load
-  // resume audio context if needed (user gesture)
+  } else {
+    diagram.style.display = 'none';
+  }
   if (audioCtx.state === 'suspended') {
-    // try to resume on any user gesture (play button) — browsers require gesture
-    // Here we attempt resume; if blocked, user can click Play.
     audioCtx.resume().catch(()=>{});
   }
   const freqs = chordToFrequencies(chord.fingering);
   setTimeout(()=> playChord(freqs, strumStyle.value), 150);
 }
 
-/* --- Diagram drawing: simple 4-string, 4 frets view */
+/* --- Diagram drawing: uses CSS variables for colors */
 function drawDiagram(fingering) {
   const ctx = diagram.getContext('2d');
   const w = diagram.width, h = diagram.height;
   ctx.clearRect(0,0,w,h);
+
+  // Read CSS variables
+  const styles = getComputedStyle(document.documentElement);
+  const colorString = styles.getPropertyValue('--color-string').trim();
+  const colorFret   = styles.getPropertyValue('--color-fret').trim();
+  const colorLabel  = styles.getPropertyValue('--color-label').trim();
+  const colorDot    = styles.getPropertyValue('--color-dot').trim();
+  const colorMuted  = styles.getPropertyValue('--color-muted').trim();
+  const colorDotText= styles.getPropertyValue('--color-dot-text').trim();
+
   const margin = 18;
   const nutH = 14;
-  // draw strings vertical
   const cols = 4;
-  const rows = 5; // nut + frets 1-4
   const sx = margin;
   const sy = margin + nutH;
   const gw = w - margin*2;
   const gh = h - margin*2 - nutH;
   const stringX = Array.from({length:4},(_,i)=> Math.round(sx + (gw/(cols-1))*i));
   const fretY = [sy].concat(Array.from({length:4},(_,i)=> Math.round(sy + gh*(i+1)/4)));
-  // background
-  ctx.fillStyle = '#f9feff';
-  ctx.fillRect(0,0,w,h);
+
   // strings
-  ctx.strokeStyle = '#9fc7df';
+  ctx.strokeStyle = colorString;
   ctx.lineWidth = 2.2;
   for (let x of stringX) {
     ctx.beginPath(); ctx.moveTo(x,sy-6); ctx.lineTo(x, fretY[fretY.length-1]+6); ctx.stroke();
   }
-  // frets
-  ctx.strokeStyle = '#cfeaf9';
+
+  // frets (including nut)
+  ctx.strokeStyle = colorFret;
   ctx.lineWidth = 2;
   for (let i=0;i<fretY.length;i++){
-    // nut is thicker
     ctx.beginPath(); ctx.moveTo(stringX[0]-8, fretY[i]); ctx.lineTo(stringX[stringX.length-1]+8, fretY[i]); ctx.stroke();
   }
-  // draw string labels at top (G C E A)
-  ctx.fillStyle='#0c4666'; ctx.font='12px system-ui';
+
+  // string labels at top (G C E A)
+  ctx.fillStyle = colorLabel; ctx.font = '12px system-ui';
   ['G','C','E','A'].forEach((s,i)=> ctx.fillText(s, stringX[i]-6, margin+10));
-  // draw finger dots
+
+  // finger dots
   fingering.forEach((f,i)=>{
     const x = stringX[i];
     if (f === 'x' || f === 'X') {
-      ctx.fillStyle='#c63a2b'; ctx.font='14px system-ui';
+      ctx.fillStyle = colorMuted; ctx.font='14px system-ui';
       ctx.fillText('x', x-5, sy-10);
     } else if (f === 0) {
-      ctx.fillStyle='#0b6fb2'; ctx.beginPath();
+      ctx.fillStyle = colorDot; ctx.beginPath();
       ctx.arc(x, sy-8, 6, 0, Math.PI*2); ctx.fill();
-      ctx.fillStyle='white'; ctx.font='11px system-ui'; ctx.fillText('o', x-4, sy-5);
+      ctx.fillStyle = colorDotText; ctx.font='11px system-ui'; ctx.fillText('o', x-4, sy-5);
     } else {
-      const fretIndex = Math.min(4, f); // show within view; if higher, mark number
+      const fretIndex = Math.min(4, f);
       const yTop = fretY[fretIndex-1];
       const yBottom = fretY[fretIndex];
       const y = Math.round((yTop + yBottom)/2);
-      ctx.fillStyle='#0b6fb2'; ctx.beginPath(); ctx.arc(x,y,10,0,Math.PI*2); ctx.fill();
-      // if fret >4, annotate
+      ctx.fillStyle = colorDot; ctx.beginPath(); ctx.arc(x,y,10,0,Math.PI*2); ctx.fill();
       if (f > 4) {
-        ctx.fillStyle='white'; ctx.font='11px system-ui'; ctx.fillText(f, x-6, y+4);
+        ctx.fillStyle = colorDotText; ctx.font='11px system-ui'; ctx.fillText(f, x-6, y+4);
       }
     }
   });
