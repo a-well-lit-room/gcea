@@ -1,0 +1,335 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Ukulele Chord Flashcards</title>
+<style>
+  body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial; margin: 0; background:#f8f8f8; color:#2d5016; display:flex; justify-content:center; align-items:center; min-height:100vh; padding:20px; }
+  @media (prefers-color-scheme: dark) {
+    body { background:#1a2d10; color:#f8f8f8; }
+  }
+  header { display:flex; align-items:center; gap:16px; margin-bottom:14px; }
+  h1 { font-size:28px; margin:0; color:#2d5016; }
+  @media (prefers-color-scheme: dark) {
+    h1 { color:#f8f8f8; }
+  }
+  .controls { display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+  button, label { background:#2d5016; color:white; border:none; padding:8px 12px; border-radius:6px; cursor:pointer; }
+  @media (prefers-color-scheme: dark) {
+    button, label { background:#f8f8f8; color:#2d5016; }
+  }
+  button.secondary { background:#d0d0d0; color:#2d5016; border:1px solid #b0b0b0; }
+  @media (prefers-color-scheme: dark) {
+    button.secondary { background:#3a6b1f; color:#f8f8f8; border:1px solid #5a8b3f; }
+  }
+  label.small { background:none; color:#2d5016; padding:0; }
+  @media (prefers-color-scheme: dark) {
+    label.small { color:#f8f8f8; }
+  }
+  .card { background:#f5f5f5; border-radius:12px; box-shadow:0 4px 10px rgba(0,0,0,0.1); padding:90px 32px; width:100%; max-width:560px; margin:0 auto; }
+  @media (prefers-color-scheme: dark) {
+    .card { background:#1a2d10; box-shadow:0 4px 10px rgba(0,0,0,0.5); }
+  }
+  .chord-title { font-size:80px; font-weight:900; margin:8px 0; color:#2d5016; display:flex; align-items:center; gap:12px; }
+  @media (prefers-color-scheme: dark) {
+    .chord-title { color:#f8f8f8; }
+  }
+  .small { font-size:13px; color:#2d5016; }
+  @media (prefers-color-scheme: dark) {
+    .small { color:#f8f8f8; }
+  }
+  .row { display:flex; gap:12px; align-items:center; margin-top:12px; flex-wrap:wrap; }
+  canvas { background:#ffffff; border-radius:8px; }
+  @media (prefers-color-scheme: dark) {
+    canvas { background:#333333; }
+  }
+  .options { display:flex; gap:8px; align-items:center; margin-left:auto; }
+  input[type="checkbox"] { width:18px; height:18px; }
+  select { padding:8px; border-radius:6px; border:1px solid #b0b0b0; background:#f5f5f5; color:#2d5016; }
+  @media (prefers-color-scheme: dark) {
+    select { border:1px solid #5a8b3f; background:#1a2d10; color:#f8f8f8; }
+  }
+  #tipRow { transition: opacity 0.5s ease-out; }
+  #tipRow.fade-out { opacity: 0; }
+  main { display:flex; justify-content:center; width:100%; }
+  footer { margin-top:14px; font-size:12px; color:#2d5016; }
+  @media (prefers-color-scheme: dark) {
+    footer { color:#f8f8f8; }
+  }
+</style>
+</head>
+<body>
+<main>
+  <section class="card" aria-live="polite">
+    <div style="display:flex;gap:16px;justify-content:space-between;align-items:flex-start;">
+      <div>
+        <div class="chord-title" id="chordName">C</div>
+        <div class="small" id="chordType">Major — Root position</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:12px;min-width:200px;text-align:right;">
+        <div style="display:flex;gap:8px;align-items:center;justify-content:flex-end;">
+          <label class="small" style="display:flex;gap:8px;align-items:center;color:#2d5016"><input id="showFingering" type="checkbox">Show fingering</label>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center;justify-content:flex-end;">
+          <select id="scale" title="Pick chord set" style="color:#2d5016">
+            <option value="all">All common chords</option>
+            <option value="maj">Major only</option>
+            <option value="min">Minor only</option>
+            <option value="seventh">Sevenths</option>
+          </select>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center;justify-content:flex-end;">
+          <label class="small" style="color:#2d5016">Strum style:</label>
+          <select id="strumStyle" class="secondary" style="background:white;color:#2d5016;border:1px solid #b0b0b0;">
+            <option value="down">Down strum</option>
+            <option value="arpeggio">Arpeggio</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <canvas id="diagram" width="400" height="450" style="display:none"></canvas>
+    </div>
+
+    <div style="display:flex;align-items:center;gap:12px;margin-top:16px;">
+      <div class="controls" style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+        <label class="secondary" title="Auto advance every 5s"><input id="autoAdvance" type="checkbox" style="margin-right:8px">Auto</label>
+        <button id="prev" class="secondary">Previous</button>
+        <button id="next">Next</button>
+        <button id="play" class="secondary">Replay</button>
+      </div>
+    </div>
+
+    <div class="row" id="tipRow">
+      <div class="small">Tip: Click Next or press space to get a new chord.</div>
+    </div>
+  </section>
+  <footer>
+  </footer>
+</main>
+
+<script>
+/* --- Data: chords in standard ukulele tuning G4 C4 E4 A4 (strings 4 ->1). 
+   Fingering: array of fret numbers or 'x' for muted/open '0' open. Format [G,C,E,A].
+   chordName, type, fingering, optional alias notes (frequencies will be computed). */
+const CHORDS = [
+  { name:"C", type:"Major", fingering:[0,0,0,3] },
+  { name:"G", type:"Major", fingering:[0,2,3,2] },
+  { name:"Am", type:"Minor", fingering:[2,0,0,0] },
+  { name:"F", type:"Major", fingering:[2,0,1,0] },
+  { name:"D", type:"Major", fingering:[2,2,2,0] },
+  { name:"E", type:"Major", fingering:[1,4,0,2] },
+  { name:"A", type:"Major", fingering:[2,1,0,0] },
+  { name:"Em", type:"Minor", fingering:[0,4,3,2] },
+  { name:"Bm", type:"Minor", fingering:[4,2,2,2] },
+  { name:"D7", type:"Seventh", fingering:[2,2,2,3] },
+  { name:"C7", type:"Seventh", fingering:[0,0,0,1] },
+  { name:"G7", type:"Seventh", fingering:[0,2,1,2] },
+  { name:"A7", type:"Seventh", fingering:[0,1,0,0] },
+  { name:"Bm7", type:"Seventh", fingering:[2,2,2,2] },
+  { name:"F#m", type:"Minor", fingering:[4,4,3,2] }
+];
+
+/* --- Tuning base notes (MIDI numbers): G4 C4 E4 A4
+   We'll compute frequencies from MIDI numbers. Standard A4=440Hz. */
+const MIDI = { "G4":67, "C4":60, "E4":64, "A4":69 };
+const STRINGS = [MIDI.G4, MIDI.C4, MIDI.E4, MIDI.A4]; // string order high->low in data
+function midiToFreq(m) { return 440 * Math.pow(2,(m-69)/12); }
+
+/* --- UI refs */
+const chordNameEl = document.getElementById('chordName');
+const chordTypeEl = document.getElementById('chordType');
+const diagram = document.getElementById('diagram');
+const showFingering = document.getElementById('showFingering');
+const nextBtn = document.getElementById('next');
+const prevBtn = document.getElementById('prev');
+const playBtn = document.getElementById('play');
+const autoAdvance = document.getElementById('autoAdvance');
+const scaleSel = document.getElementById('scale');
+const strumStyle = document.getElementById('strumStyle');
+
+let index = 0;
+let filtered = CHORDS.slice();
+let autoTimer = null;
+let chordLoadCount = 0;
+const tipRow = document.getElementById('tipRow');
+
+/* --- Audio setup */
+const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+function playChord(frequencies, style='down') {
+  // Simple plucked/strummed synth: short attack, pluck-like envelope
+  const now = audioCtx.currentTime;
+  if (style === 'down') {
+    // all notes slightly staggered for strum feel
+    frequencies.forEach((f,i) => {
+      if (!f) return;
+      const t = now + i*0.03;
+      const o = audioCtx.createOscillator();
+      const g = audioCtx.createGain();
+      o.type = 'sine';
+      o.frequency.value = f;
+      g.gain.value = 0;
+      o.connect(g); g.connect(audioCtx.destination);
+      g.gain.setValueAtTime(0, t);
+      g.gain.linearRampToValueAtTime(0.9, t+0.01);
+      g.gain.exponentialRampToValueAtTime(0.0001, t+2.4);
+      o.start(t); o.stop(t+2.5);
+    });
+  } else {
+    // arpeggio: play one-by-one with longer decay
+    frequencies.forEach((f,i) => {
+      if (!f) return;
+      const t = now + i*0.2;
+      const o = audioCtx.createOscillator();
+      const g = audioCtx.createGain();
+      o.type = 'sine';
+      o.frequency.value = f;
+      g.gain.value = 0;
+      o.connect(g); g.connect(audioCtx.destination);
+      g.gain.setValueAtTime(0, t);
+      g.gain.linearRampToValueAtTime(0.86, t+0.02);
+      g.gain.exponentialRampToValueAtTime(0.0002, t+3.5);
+      o.start(t); o.stop(t+3.6);
+    });
+  }
+}
+
+/* --- Utility: compute played frequencies from fingering */
+function chordToFrequencies(fingering) {
+  // fingering order [G,C,E,A]; 0 => open, x => muted
+  return fingering.map((fret,i) => {
+    if (fret === 'x' || fret === 'X') return null;
+    const baseMidi = STRINGS[i];
+    const midi = baseMidi + Number(fret);
+    return midiToFreq(midi);
+  });
+}
+
+/* --- Display logic */
+function renderChord(ci) {
+  const chord = filtered[ci];
+  chordNameEl.textContent = chord.name;
+  chordTypeEl.textContent = chord.type;
+  chordLoadCount++;
+  if (chordLoadCount > 3 && tipRow) {
+    tipRow.classList.add('fade-out');
+  }
+  if (showFingering.checked) {
+    diagram.style.display = 'block';
+    drawDiagram(chord.fingering);
+  } else diagram.style.display = 'none';
+  // play automatically on load
+  // resume audio context if needed (user gesture)
+  if (audioCtx.state === 'suspended') {
+    // try to resume on any user gesture (play button) — browsers require gesture
+    // Here we attempt resume; if blocked, user can click Play.
+    audioCtx.resume().catch(()=>{});
+  }
+  const freqs = chordToFrequencies(chord.fingering);
+  setTimeout(()=> playChord(freqs, strumStyle.value), 150);
+}
+
+/* --- Diagram drawing: simple 4-string, 4 frets view */
+function drawDiagram(fingering) {
+  const ctx = diagram.getContext('2d');
+  const w = diagram.width, h = diagram.height;
+  ctx.clearRect(0,0,w,h);
+  const margin = 18;
+  const nutH = 14;
+  // draw strings vertical
+  const cols = 4;
+  const rows = 5; // nut + frets 1-4
+  const sx = margin;
+  const sy = margin + nutH;
+  const gw = w - margin*2;
+  const gh = h - margin*2 - nutH;
+  const stringX = Array.from({length:4},(_,i)=> Math.round(sx + (gw/(cols-1))*i));
+  const fretY = [sy].concat(Array.from({length:4},(_,i)=> Math.round(sy + gh*(i+1)/4)));
+  // background
+  ctx.fillStyle = '#f9feff';
+  ctx.fillRect(0,0,w,h);
+  // strings
+  ctx.strokeStyle = '#9fc7df';
+  ctx.lineWidth = 2.2;
+  for (let x of stringX) {
+    ctx.beginPath(); ctx.moveTo(x,sy-6); ctx.lineTo(x, fretY[fretY.length-1]+6); ctx.stroke();
+  }
+  // frets
+  ctx.strokeStyle = '#cfeaf9';
+  ctx.lineWidth = 2;
+  for (let i=0;i<fretY.length;i++){
+    // nut is thicker
+    ctx.beginPath(); ctx.moveTo(stringX[0]-8, fretY[i]); ctx.lineTo(stringX[stringX.length-1]+8, fretY[i]); ctx.stroke();
+  }
+  // draw string labels at top (G C E A)
+  ctx.fillStyle='#0c4666'; ctx.font='12px system-ui';
+  ['G','C','E','A'].forEach((s,i)=> ctx.fillText(s, stringX[i]-6, margin+10));
+  // draw finger dots
+  fingering.forEach((f,i)=>{
+    const x = stringX[i];
+    if (f === 'x' || f === 'X') {
+      ctx.fillStyle='#c63a2b'; ctx.font='14px system-ui';
+      ctx.fillText('x', x-5, sy-10);
+    } else if (f === 0) {
+      ctx.fillStyle='#0b6fb2'; ctx.beginPath();
+      ctx.arc(x, sy-8, 6, 0, Math.PI*2); ctx.fill();
+      ctx.fillStyle='white'; ctx.font='11px system-ui'; ctx.fillText('o', x-4, sy-5);
+    } else {
+      const fretIndex = Math.min(4, f); // show within view; if higher, mark number
+      const yTop = fretY[fretIndex-1];
+      const yBottom = fretY[fretIndex];
+      const y = Math.round((yTop + yBottom)/2);
+      ctx.fillStyle='#0b6fb2'; ctx.beginPath(); ctx.arc(x,y,10,0,Math.PI*2); ctx.fill();
+      // if fret >4, annotate
+      if (f > 4) {
+        ctx.fillStyle='white'; ctx.font='11px system-ui'; ctx.fillText(f, x-6, y+4);
+      }
+    }
+  });
+}
+
+/* --- Navigation */
+function filterChords() {
+  const v = scaleSel.value;
+  if (v === 'all') filtered = CHORDS.slice();
+  else if (v === 'maj') filtered = CHORDS.filter(c=>c.type.toLowerCase().includes('major'));
+  else if (v === 'min') filtered = CHORDS.filter(c=>c.type.toLowerCase().includes('minor'));
+  else if (v === 'seventh') filtered = CHORDS.filter(c=>c.type.toLowerCase().includes('sevent'));
+  if (index >= filtered.length) index = 0;
+}
+function showIndex(i) {
+  index = (i + filtered.length) % filtered.length;
+  renderChord(index);
+}
+nextBtn.addEventListener('click', ()=> { showIndex(index+1); });
+prevBtn.addEventListener('click', ()=> { showIndex(index-1); });
+playBtn.addEventListener('click', ()=> { renderChord(index); });
+scaleSel.addEventListener('change', ()=> { filterChords(); showIndex(0); });
+showFingering.addEventListener('change', ()=> { renderChord(index); });
+strumStyle.addEventListener('change', ()=> { /* no-op */ });
+
+/* keyboard shortcuts: space = next, left/right */
+window.addEventListener('keydown', (e)=> {
+  if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT' || e.target.isContentEditable) return;
+  if (e.code === 'Space') { e.preventDefault(); showIndex(index+1); }
+  if (e.code === 'ArrowRight') showIndex(index+1);
+  if (e.code === 'ArrowLeft') showIndex(index-1);
+});
+
+/* auto advance */
+autoAdvance.addEventListener('change', ()=>{
+  if (autoAdvance.checked) {
+    autoTimer = setInterval(()=> showIndex(index+1), 5000);
+  } else {
+    clearInterval(autoTimer); autoTimer = null;
+  }
+});
+
+/* initial load */
+filterChords();
+renderChord(0);
+</script>
+</body>
+</html>
