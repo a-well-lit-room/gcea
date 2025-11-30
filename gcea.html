@@ -248,6 +248,8 @@ const CHORDS = [
     { name:"Dsus4", type:"Suspended", fingering:[2,2,3,0] }
 ];
 
+// TODO: change diagram to SVG
+
 /* --- Tuning base notes (MIDI numbers): G4 C4 E4 A4; A4 = 440Hz. */
 const MIDI = { "G4":67, "C4":60, "E4":64, "A4":69 };
 const STRINGS = [MIDI.G4, MIDI.C4, MIDI.E4, MIDI.A4];
@@ -356,7 +358,7 @@ function drawDiagram(fingering) {
   const colorDotText= styles.getPropertyValue('--color-dot-text').trim();
 
   const margin = 18;
-  const nutH = 14;
+  const nutH = 28;
   const cols = 4;
   const sx = margin;
   const sy = margin + nutH;
@@ -369,14 +371,20 @@ function drawDiagram(fingering) {
   ctx.strokeStyle = colorString;
   ctx.lineWidth = 2.2;
   for (let x of stringX) {
-    ctx.beginPath(); ctx.moveTo(x,sy-6); ctx.lineTo(x, fretY[fretY.length-1]+6); ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(x,sy-6);
+    ctx.lineTo(x, fretY[fretY.length-1]+6);
+    ctx.stroke();
   }
 
   // frets (including nut)
   ctx.strokeStyle = colorFret;
   ctx.lineWidth = 2;
   for (let i=0;i<fretY.length;i++){
-    ctx.beginPath(); ctx.moveTo(stringX[0]-8, fretY[i]); ctx.lineTo(stringX[stringX.length-1]+8, fretY[i]); ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(stringX[0]-8, fretY[i]);
+    ctx.lineTo(stringX[stringX.length-1]+8, fretY[i]);
+    ctx.stroke();
   }
 
   // string labels at top (G C E A)
@@ -390,17 +398,36 @@ function drawDiagram(fingering) {
       ctx.fillStyle = colorMuted; ctx.font='14px system-ui';
       ctx.fillText('x', x-5, sy-10);
     } else if (f === 0) {
-      ctx.fillStyle = colorDot; ctx.beginPath();
-      ctx.arc(x, sy-8, 6, 0, Math.PI*2); ctx.fill();
-      ctx.fillStyle = colorDotText; ctx.font='11px system-ui'; ctx.fillText('o', x-4, sy-5);
+      const cx = x;
+      const cy = sy - 20; // same center as the circle
+
+      // Draw circle
+      ctx.fillStyle = colorDot;
+      ctx.beginPath();
+      ctx.arc(cx, cy, 10, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Draw centered "o"
+      ctx.save();
+      ctx.fillStyle = colorDotText;
+      ctx.font = '11px system-ui';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('o', cx, cy);
+      ctx.restore();
     } else {
       const fretIndex = Math.min(4, f);
       const yTop = fretY[fretIndex-1];
       const yBottom = fretY[fretIndex];
       const y = Math.round((yTop + yBottom)/2);
-      ctx.fillStyle = colorDot; ctx.beginPath(); ctx.arc(x,y,10,0,Math.PI*2); ctx.fill();
+      ctx.fillStyle = colorDot;
+      ctx.beginPath();
+      ctx.arc(x,y,10,0,Math.PI*2);
+      ctx.fill();
       if (f > 4) {
-        ctx.fillStyle = colorDotText; ctx.font='11px system-ui'; ctx.fillText(f, x-6, y+4);
+        ctx.fillStyle = colorDotText;
+        ctx.font='11px system-ui';
+        ctx.fillText(f, x-6, y+4);
       }
     }
   });
@@ -456,7 +483,8 @@ autoAdvance.addEventListener('change', ()=>{
 
 /* initial load */
 filterChords();
-renderChord(0);
+index = Math.floor(Math.random() * filtered.length); // pick random starting chord
+renderChord(index);
 </script>
 </body>
 </html>
