@@ -1,4 +1,9 @@
 <!doctype html>
+
+<!-- TODO: change diagram to SVG -->
+<!-- TODO: add scales (for each chord?) -->
+
+
 <html lang="en">
 <head>
 <meta charset="utf-8" />
@@ -47,6 +52,21 @@
     }
   }
 
+  /* desktop */
+  @media (min-width: 768px) {
+  
+  }
+
+  /* mobile */
+  @media (max-width: 480px) {
+    
+  }
+
+  /* tablet */
+  @media (min-width: 480px) and (max-width: 768px) {
+    
+  }
+
   body {
     font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial;
     margin: 0;
@@ -79,6 +99,8 @@
     background: var(--color-secondary-bg);
     color: var(--color-secondary-text);
     border: 1px solid var(--color-border);
+    padding: 8px 12px;
+    border-radius: 6px;
     font-size: 16px;
   }
   label.small {
@@ -150,7 +172,7 @@
         </div>
         <div style="display:flex;gap:8px;align-items:center;justify-content:flex-end;">
           <select id="scale" title="Pick chord set">
-            <option value="all">All common chords</option>
+            <option value="all">All chords</option>
             <option value="maj">Major only</option>
             <option value="min">Minor only</option>
             <option value="seventh">Sevenths</option>
@@ -176,7 +198,7 @@
           <input id="autoAdvance" type="checkbox" style="margin:0px 8px 0px 0px">Auto
         </label>
         <button id="prev" class="secondary">Previous</button>
-        <button id="next">Next</button>
+        <button id="next" class="secondary">Next</button>
         <button id="play" class="secondary">Replay</button>
       </div>
     </div>
@@ -248,8 +270,6 @@ const CHORDS = [
     { name:"Dsus4", type:"Suspended", fingering:[2,2,3,0] }
 ];
 
-// TODO: change diagram to SVG
-
 /* --- Tuning base notes (MIDI numbers): G4 C4 E4 A4; A4 = 440Hz. */
 const MIDI = { "G4":67, "C4":60, "E4":64, "A4":69 };
 const STRINGS = [MIDI.G4, MIDI.C4, MIDI.E4, MIDI.A4];
@@ -274,9 +294,35 @@ let chordLoadCount = 0;
 const tipRow = document.getElementById('tipRow');
 
 /* --- Audio setup */
+
+// const master = audioCtx.createGain();
+// master.gain.value = 0.15; // overall volume control
+// master.connect(audioCtx.destination);
+
+// frequencies.forEach((f,i) => {
+//   if (!f) return;
+//   const t = now + i*0.03;
+//   const o = audioCtx.createOscillator();
+//   const g = audioCtx.createGain();
+//   o.type = 'sine';
+//   o.frequency.value = f;
+//   o.connect(g);
+//   g.connect(master);
+//   g.gain.setValueAtTime(0, t);
+//   g.gain.linearRampToValueAtTime(0.12, t+0.01);   // lower peak
+//   g.gain.exponentialRampToValueAtTime(0.00001, t+2.4); // tiny positive
+//   o.start(t);
+//   o.stop(t+2.5);
+// });
+
+
 const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 function playChord(frequencies, style='down') {
   const now = audioCtx.currentTime;
+  const master = audioCtx.createGain();
+  master.gain.value = 0.25; // overall volume control
+  master.connect(audioCtx.destination);
+
   if (style === 'down') {
     frequencies.forEach((f,i) => {
       if (!f) return;
@@ -286,7 +332,8 @@ function playChord(frequencies, style='down') {
       o.type = 'sine';
       o.frequency.value = f;
       g.gain.value = 0;
-      o.connect(g); g.connect(audioCtx.destination);
+      o.connect(g);
+      g.connect(master);
       g.gain.setValueAtTime(0, t);
       g.gain.linearRampToValueAtTime(0.9, t+0.01);
       g.gain.exponentialRampToValueAtTime(0.0001, t+2.4);
@@ -301,7 +348,8 @@ function playChord(frequencies, style='down') {
       o.type = 'sine';
       o.frequency.value = f;
       g.gain.value = 0;
-      o.connect(g); g.connect(audioCtx.destination);
+      o.connect(g);
+      g.connect(master);
       g.gain.setValueAtTime(0, t);
       g.gain.linearRampToValueAtTime(0.86, t+0.02);
       g.gain.exponentialRampToValueAtTime(0.0002, t+3.5);
