@@ -21,12 +21,12 @@
     --color-input-bg: var(--color-card-bg);
 
     /* Diagram colors */
-    --color-canvas-bg: #ffffff;
+    --color-canvas-bg: #f5f5f5;
     --color-canvas-bg-dark: #1a2d10;
-    --color-string: #9fc7df;
-    --color-fret: #cfeaf9;
+    --color-string: #5a8b3f;
+    --color-fret: #b0b0b0;
     --color-label: #0c4666;
-    --color-dot: #0b6fb2;
+    --color-dot: #2d5016;
     --color-muted: #c63a2b;
     --color-dot-text: #ffffff;
   }
@@ -60,7 +60,13 @@
   }
 
   h1 { font-size:28px; margin:0; color: var(--color-text); }
-  .controls { display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+  .controls, label { 
+    display:flex; 
+    gap:8px; 
+    flex-wrap:wrap; 
+    align-items:center; 
+    font-size: 16px;
+  }
   button, label {
     background: var(--color-primary);
     color: var(--color-primary-text);
@@ -73,6 +79,7 @@
     background: var(--color-secondary-bg);
     color: var(--color-secondary-text);
     border: 1px solid var(--color-border);
+    font-size: 16px;
   }
   label.small {
     background: none;
@@ -119,7 +126,7 @@
     color: var(--color-text);
   }
 
-  input[type="checkbox"] { width: 18px; height: 18px; }
+  input[type="checkbox"] { width: 16px; height: 16px; }
 
   #tipRow { transition: opacity 0.5s ease-out; }
   #tipRow.fade-out { opacity: 0; }
@@ -166,7 +173,7 @@
     <div style="display:flex;align-items:center;gap:12px;margin-top:16px;">
       <div class="controls">
         <label class="secondary" title="Auto advance every 5s">
-          <input id="autoAdvance" type="checkbox" style="margin-right:8px">Auto
+          <input id="autoAdvance" type="checkbox" style="margin:0px 8px 0px 0px">Auto
         </label>
         <button id="prev" class="secondary">Previous</button>
         <button id="next">Next</button>
@@ -184,21 +191,61 @@
 <script>
 /* --- Data: chords in standard ukulele tuning G4 C4 E4 A4 (strings 4 -> 1). */
 const CHORDS = [
-  { name:"C", type:"Major", fingering:[0,0,0,3] },
-  { name:"G", type:"Major", fingering:[0,2,3,2] },
-  { name:"Am", type:"Minor", fingering:[2,0,0,0] },
-  { name:"F", type:"Major", fingering:[2,0,1,0] },
-  { name:"D", type:"Major", fingering:[2,2,2,0] },
-  { name:"E", type:"Major", fingering:[1,4,0,2] },
-  { name:"A", type:"Major", fingering:[2,1,0,0] },
-  { name:"Em", type:"Minor", fingering:[0,4,3,2] },
-  { name:"Bm", type:"Minor", fingering:[4,2,2,2] },
-  { name:"D7", type:"Seventh", fingering:[2,2,2,3] },
-  { name:"C7", type:"Seventh", fingering:[0,0,0,1] },
-  { name:"G7", type:"Seventh", fingering:[0,2,1,2] },
-  { name:"A7", type:"Seventh", fingering:[0,1,0,0] },
-  { name:"Bm7", type:"Seventh", fingering:[2,2,2,2] },
-  { name:"F#m", type:"Minor", fingering:[4,4,3,2] }
+    { name:"C", type:"Major", fingering:[0,0,0,3] },
+    { name:"Cmaj7", type:"Major7", fingering:[0,0,0,2] },
+    { name:"Cm7", type:"Minor7", fingering:[3,3,3,3] },
+    { name:"C7", type:"Seventh", fingering:[0,0,0,1] },
+    { name:"Csus2", type:"Suspended", fingering:[0,0,0,0] },
+    { name:"Csus4", type:"Suspended", fingering:[0,0,0,1] },
+
+    { name:"G", type:"Major", fingering:[0,2,3,2] },
+    { name:"Gmaj7", type:"Major7", fingering:[0,2,2,2] },
+    { name:"Gm7", type:"Minor7", fingering:[0,2,1,3] },
+    { name:"G7", type:"Seventh", fingering:[0,2,1,2] },
+    { name:"Gdim", type:"Diminished", fingering:[2,3,2,3] },
+    { name:"Gsus4", type:"Suspended", fingering:[0,2,3,0] },
+
+    { name:"Am", type:"Minor", fingering:[2,0,0,0] },
+    { name:"Am7", type:"Minor7", fingering:[0,0,0,0] },
+    { name:"Amaj7", type:"Major7", fingering:[1,1,1,0] },
+    { name:"Am9", type:"Minor9", fingering:[2,0,0,2] },
+    { name:"A7", type:"Seventh", fingering:[0,1,0,0] },
+
+    { name:"F", type:"Major", fingering:[2,0,1,0] },
+    { name:"Fmaj7", type:"Major7", fingering:[2,0,1,0] },
+    { name:"Fm7", type:"Minor7", fingering:[3,1,1,1] },
+    { name:"Fdim", type:"Diminished", fingering:[3,2,3,2] },
+    { name:"Fsus2", type:"Suspended", fingering:[2,0,0,0] },
+
+    { name:"D", type:"Major", fingering:[2,2,2,0] },
+    { name:"Dmaj7", type:"Major7", fingering:[2,2,2,2] },
+    { name:"Dm7", type:"Minor7", fingering:[2,2,1,0] },
+    { name:"D7", type:"Seventh", fingering:[2,2,2,3] },
+    { name:"Ddim", type:"Diminished", fingering:[2,1,2,1] },
+
+    { name:"E", type:"Major", fingering:[1,4,0,2] },
+    { name:"Emaj7", type:"Major7", fingering:[1,4,1,2] },
+    { name:"Em", type:"Minor", fingering:[0,4,3,2] },
+    { name:"Em7", type:"Minor7", fingering:[0,4,3,0] },
+    { name:"Edim", type:"Diminished", fingering:[1,0,1,0] },
+
+    { name:"A", type:"Major", fingering:[2,1,0,0] },
+    { name:"A7", type:"Seventh", fingering:[0,1,0,0] },
+    { name:"Am", type:"Minor", fingering:[2,0,0,0] },
+    { name:"Am7", type:"Minor7", fingering:[2,0,0,0] },
+    { name:"Adim", type:"Diminished", fingering:[2,1,2,1] },
+
+    { name:"Bm", type:"Minor", fingering:[4,2,2,2] },
+    { name:"Bm7", type:"Seventh", fingering:[2,2,2,2] },
+    { name:"Bdim", type:"Diminished", fingering:[3,2,3,2] },
+
+    { name:"F#m", type:"Minor", fingering:[4,4,3,2] },
+    { name:"F#m7", type:"Minor7", fingering:[2,2,2,2] },
+    { name:"F#dim", type:"Diminished", fingering:[1,0,1,0] },
+
+    { name:"Cadd9", type:"Add9", fingering:[0,0,0,0] },
+    { name:"Gadd9", type:"Add9", fingering:[2,2,3,2] },
+    { name:"Dsus4", type:"Suspended", fingering:[2,2,3,0] }
 ];
 
 /* --- Tuning base notes (MIDI numbers): G4 C4 E4 A4; A4 = 440Hz. */
@@ -372,7 +419,11 @@ function showIndex(i) {
   index = (i + filtered.length) % filtered.length;
   renderChord(index);
 }
-nextBtn.addEventListener('click', ()=> { showIndex(index+1); });
+function showRandomChord() {
+  index = Math.floor(Math.random() * filtered.length);
+  renderChord(index);
+}
+nextBtn.addEventListener('click', ()=> { showRandomChord(); });
 prevBtn.addEventListener('click', ()=> { showIndex(index-1); });
 playBtn.addEventListener('click', ()=> { renderChord(index); });
 scaleSel.addEventListener('change', ()=> { filterChords(); showIndex(0); });
@@ -382,15 +433,22 @@ strumStyle.addEventListener('change', ()=> { /* no-op */ });
 /* keyboard shortcuts: space = next, left/right */
 window.addEventListener('keydown', (e)=> {
   if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT' || e.target.isContentEditable) return;
-  if (e.code === 'Space') { e.preventDefault(); showIndex(index+1); }
-  if (e.code === 'ArrowRight') showIndex(index+1);
+  if (e.code === 'Space' || e.code === 'ArrowRight') { 
+    e.preventDefault(); 
+    showRandomChord(); 
+  }
   if (e.code === 'ArrowLeft') showIndex(index-1);
+  
+  if (e.key.toLowerCase() === 'c') {
+    showFingering.checked = !showFingering.checked;
+    renderChord(index);
+  }
 });
 
 /* auto advance */
 autoAdvance.addEventListener('change', ()=>{
   if (autoAdvance.checked) {
-    autoTimer = setInterval(()=> showIndex(index+1), 5000);
+    autoTimer = setInterval(()=> showRandomChord(), 5000);
   } else {
     clearInterval(autoTimer); autoTimer = null;
   }
